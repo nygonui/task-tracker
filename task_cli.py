@@ -66,17 +66,15 @@ class TaskCLI:
             print("Just maybe ... add a task first")
             return
 
-        # TO-DO: otimizar sistema de busca 
-        for task in self.task_list:
-            if task["id"] == id_task:
-                task["description"] = description
-                task["updatedAt"] = str(datetime.datetime.now())
+        index = self.binary_search_task_list(id_task)
+        if index == None:
+            print("Erro to update task: ID not found")
+        else:
+            self.task_list[index]["description"] = description
+            self.task_list[index]["updatedAt"] = str(datetime.datetime.now())
+            self.write_task_file()
+            print(f"Task (ID:{id_task}) updated")
 
-                self.write_task_file()
-                print(f"Task (ID:{id_task}) updated")
-                return
-        
-        print("Erro to update task: ID not found")
         return
         
     
@@ -91,14 +89,14 @@ class TaskCLI:
             print("Just maybe ... add a task first")
             return
 
-        for index, task in enumerate(self.task_list):
-            if task["id"] == id_task:
-                self.task_list.pop(index)
-                self.write_task_file()
-                print(f"Task (ID: {id_task}) successfully deleted")
-                return
-
-        print("Erro to delete task: ID not found")
+        index = self.binary_search_task_list(id_task)
+        if index == None:
+            print("Erro to update task: ID not found")
+        else: 
+            self.task_list.pop(index)
+            self.write_task_file()
+            print(f"Task (ID: {id_task}) successfully deleted")
+        
         return
     
 
@@ -108,22 +106,19 @@ class TaskCLI:
             return
 
         if status == 'done' or status == 'in-progress':
-            # TO-DO: Melhorar sistema de busca
-            for task in self.task_list:
-                if task["id"] == id_task:
-                    task["status"] = status
-                    task["updatedAt"] = str(datetime.datetime.now())
+            index = self.binary_search_task_list(id_task)
+            if index == None:
+                print("Erro to change status from task: ID not found")           
+            else:
+                self.task_list[index]["status"] = status
+                self.task_list[index]["updatedAt"] = str(datetime.datetime.now())
 
-                    self.write_task_file()
-                    print(f"Task (ID:{id_task}) changed status to: {status}")
-                    return
-            
-            print("Erro to change status from task: ID not found")
+                self.write_task_file()
+                print(f"Task (ID:{id_task}) changed status to: {status}")
             return
         else:
             print(f"Erro to change status: {status} status not exist. Try 'done' or 'in-progress.")
-
-
+            return
 
     def list_visualization(self, status=None) -> None:
         """
@@ -156,6 +151,23 @@ class TaskCLI:
             
         return
 
+
+    def binary_search_task_list(self, id_search):
+        start = 0
+        end = len(self.task_list) - 1
+        
+        while start <= end:
+            middle = int((start + end)/2)
+            guess = self.task_list[middle]
+
+            if guess['id'] == id_search:
+                return middle
+            if guess['id'] > id_search:
+                end = middle - 1
+            else:
+                start = middle + 1
+            
+        return None
 
 
     def __str__(self):
