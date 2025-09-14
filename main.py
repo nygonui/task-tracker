@@ -20,19 +20,15 @@ if __name__ == '__main__':
             task_cli.delete(id_task)
         elif command == 'mark-in-progress':
             id_task = int(values[0])
-            task_cli.mark_in_progress(id_task)
+            task_cli.update_status(id_task, 'in-progress')
         elif command == 'mark-done':
             id_task = int(values[0])
-            task_cli.mark_done(id_task)
+            task_cli.update_status(id_task, 'done')
         elif command == 'list':
             if values == []:
                 task_cli.list_visualization()
-            elif values[0] == 'done':
-                task_cli.done_tasks_visualization()
-            elif values[0] == 'in-progress':
-                task_cli.in_progress_tasks_visualization()
-            elif values[0] == 'todo':
-                task_cli.todo_tasks_visualization()
+            else:
+                task_cli.list_visualization(values[0])
         else:
             print(f"Command '{command}' not exists")
         

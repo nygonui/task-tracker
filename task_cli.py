@@ -102,45 +102,30 @@ class TaskCLI:
         return
     
 
-    def mark_in_progress(self, id_task: int) -> None:
+    def update_status(self, id_task: int, status: str) -> None:
         if not self.task_file_path.exists():
             print("Just maybe ... add a task first")
             return
 
-        # TO-DO: otimizar sistema de busca 
-        for task in self.task_list:
-            if task["id"] == id_task:
-                task["status"] = "in-progress"
-                task["updatedAt"] = str(datetime.datetime.now())
+        if status == 'done' or status == 'in-progress':
+            # TO-DO: Melhorar sistema de busca
+            for task in self.task_list:
+                if task["id"] == id_task:
+                    task["status"] = status
+                    task["updatedAt"] = str(datetime.datetime.now())
 
-                self.write_task_file()
-                print(f"Task (ID:{id_task}) changed status to: in-progess")
-                return
-        
-        print("Erro to change status from task: ID not found")
-        return
-
-    
-    def mark_done(self, id_task: int) -> None:
-        if not self.task_file_path.exists():
-            print("Just maybe ... add a task first")
+                    self.write_task_file()
+                    print(f"Task (ID:{id_task}) changed status to: {status}")
+                    return
+            
+            print("Erro to change status from task: ID not found")
             return
-
-        # TO-DO: otimizar sistema de busca 
-        for task in self.task_list:
-            if task["id"] == id_task:
-                task["status"] = "done"
-                task["updatedAt"] = str(datetime.datetime.now())
-
-                self.write_task_file()
-                print(f"Task (ID:{id_task}) changed status to: done")
-                return
-        
-        print("Erro to change status from task: ID not found")
-        return
+        else:
+            print(f"Erro to change status: {status} status not exist. Try 'done' or 'in-progress.")
 
 
-    def list_visualization(self) -> None:
+
+    def list_visualization(self, status=None) -> None:
         """
         Show the tasks list
         """
@@ -148,66 +133,29 @@ class TaskCLI:
             print("The task list not exists. Use 'add' command to track your first task!")
             return
 
+        count_success = False    
         for task in self.task_list:
-            print(f'ID:          {task['id']}')
-            print(f'DESCRIPTION: {task['description']}')
-            print(f'STATUS:      {task['status']}')
-            print(f'CREATED AT:  {task['createdAt']}')
-            print(f'UPDATED AT:  {task['updatedAt']}')
-            print('-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+')
+            id_d = f"ID:          {task['id']}\n"
+            desc_d = f"DESCRIPTION: {task['description']}\n"
+            stat_d = f"STATUS:      {task['status']}\n"
+            cre_d = f"CREATED AT:  {task['createdAt']}\n"
+            upd_d = f"UPDATED AT:  {task['updatedAt']}\n"
+            div_d = "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n"
 
+            task_display = id_d + desc_d + stat_d + cre_d + upd_d + div_d
+
+            if status == None:
+                print(task_display)
+                count_success = True
+            elif task['status'] == status:
+                print(task_display)
+                count_success = True
+                      
+        if not count_success:
+            print(f"Error to display task by status: {status} not exists")     
+            
         return
 
-
-    def done_tasks_visualization(self) -> None:
-        if not self.task_file_path.exists():
-            print("The task list not exists. Use 'add' command to track your first task!")
-            return
-
-        for task in self.task_list:
-            if task["status"] == "done":
-                print(f'ID:          {task['id']}')
-                print(f'DESCRIPTION: {task['description']}')
-                print(f'STATUS:      {task['status']}')
-                print(f'CREATED AT:  {task['createdAt']}')
-                print(f'UPDATED AT:  {task['updatedAt']}')
-                print('-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+')
-
-        return
-    
-    
-    def in_progress_tasks_visualization(self) -> None:
-        if not self.task_file_path.exists():
-            print("The task list not exists. Use 'add' command to track your first task!")
-            return
-
-        for task in self.task_list:
-            if task["status"] == "in-progress":
-                print(f'ID:          {task['id']}')
-                print(f'DESCRIPTION: {task['description']}')
-                print(f'STATUS:      {task['status']}')
-                print(f'CREATED AT:  {task['createdAt']}')
-                print(f'UPDATED AT:  {task['updatedAt']}')
-                print('-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+')
-
-        return
-
-
-    def todo_tasks_visualization(self) -> None:
-        if not self.task_file_path.exists():
-            print("The task list not exists. Use 'add' command to track your first task!")
-            return
-
-        for task in self.task_list:
-            if task["status"] == "todo":
-                print(f'ID:          {task['id']}')
-                print(f'DESCRIPTION: {task['description']}')
-                print(f'STATUS:      {task['status']}')
-                print(f'CREATED AT:  {task['createdAt']}')
-                print(f'UPDATED AT:  {task['updatedAt']}')
-                print('-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+')
-
-        return
 
 
     def __str__(self):
